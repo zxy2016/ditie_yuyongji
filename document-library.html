@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>资料库 - 地铁检修APP</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 375px;
+            height: 812px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 40px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        
+        .status-bar {
+            height: 44px;
+            background-color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0 20px;
+            position: relative;
+        }
+        
+        .time {
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .status-icons {
+            display: flex;
+            gap: 5px;
+            position: absolute;
+            right: 20px;
+        }
+        
+        .status-icon {
+            width: 18px;
+            height: 18px;
+            background-color: #333;
+            border-radius: 50%;
+        }
+        
+        .header {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            background-color: #00743B;
+            color: white;
+            justify-content: center;
+            position: relative;
+        }
+        
+        .back-button {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            left: 20px;
+            cursor: pointer;
+        }
+        
+        .back-button:before {
+            content: '';
+            width: 10px;
+            height: 10px;
+            border-left: 2px solid white;
+            border-bottom: 2px solid white;
+            transform: rotate(45deg);
+            margin-left: 5px;
+        }
+        
+        .title {
+            font-size: 20px;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        .content {
+            height: calc(100% - 44px - 70px);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+        
+        .library-section {
+            flex: 1;
+            padding: 20px;
+            background-color: #f9f9f9;
+            overflow-y: auto;
+        }
+        
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            padding-left: 15px;
+        }
+        
+        .section-title:before {
+            content: '';
+            display: inline-block;
+            width: 3px;
+            height: 16px;
+            background-color: #00743B;
+            position: absolute;
+            left: 0;
+            border-radius: 2px;
+        }
+        
+        .search-bar {
+            display: flex;
+            background-color: white;
+            border-radius: 10px;
+            padding: 10px 15px;
+            margin-bottom: 20px;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .search-icon {
+            width: 20px;
+            height: 20px;
+            background-color: #ddd;
+            border-radius: 50%;
+            margin-right: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+        
+        .search-icon:before {
+            content: '';
+            width: 10px;
+            height: 10px;
+            border: 2px solid #999;
+            border-radius: 50%;
+            position: absolute;
+            left: 3px;
+            top: 3px;
+        }
+        
+        .search-icon:after {
+            content: '';
+            width: 6px;
+            height: 2px;
+            background-color: #999;
+            position: absolute;
+            transform: rotate(45deg);
+            bottom: 5px;
+            right: 4px;
+        }
+        
+        .search-input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            font-size: 14px;
+            color: #333;
+            outline: none;
+        }
+        
+        .category-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .category-card {
+            background-color: white;
+            border-radius: 15px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 0 5px 15px rgba(0, 115, 59, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 115, 59, 0.15);
+        }
+        
+        .category-icon {
+            width: 60px;
+            height: 60px;
+            background-color: #e6f2ec;
+            border-radius: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .category-icon img {
+            width: 36px;
+            height: 36px;
+            object-fit: contain;
+        }
+        
+        .category-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            text-align: center;
+        }
+        
+        .category-count {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .recent-section {
+            margin-top: 20px;
+        }
+        
+        .recent-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .recent-title:before {
+            content: '';
+            display: inline-block;
+            width: 3px;
+            height: 16px;
+            background-color: #00743B;
+            margin-right: 8px;
+            border-radius: 2px;
+        }
+        
+        .recent-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .document-item {
+            background-color: white;
+            border-radius: 10px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .document-icon {
+            width: 40px;
+            height: 40px;
+            background-color: #e6f2ec;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        
+        .document-icon img {
+            width: 24px;
+            height: 24px;
+            object-fit: contain;
+        }
+        
+        .document-info {
+            flex: 1;
+        }
+        
+        .document-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .document-meta {
+            font-size: 12px;
+            color: #999;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .tab-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 80px;
+            background-color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-top: 1px solid #eee;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .ai-assistant-button {
+            width: 160px;
+            height: 50px;
+            background: linear-gradient(135deg, #00743B, #009E50);
+            border-radius: 25px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 5px 15px rgba(0, 115, 59, 0.3);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .ai-assistant-icon {
+            width: 24px;
+            height: 24px;
+            margin-right: 8px;
+            background-color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .ai-assistant-icon img {
+            width: 18px;
+            height: 18px;
+            object-fit: contain;
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="status-bar">
+            <div class="time">9:41</div>
+            <div class="status-icons">
+                <div class="status-icon"></div>
+                <div class="status-icon"></div>
+                <div class="status-icon"></div>
+            </div>
+        </div>
+        
+        <div class="content">
+            <div class="header">
+                <a href="index.html" class="back-button"></a>
+                <div class="title">资料库</div>
+            </div>
+            
+            <div class="library-section">
+                <div class="section-title">资料分类</div>
+                
+                <div class="search-bar">
+                    <div class="search-icon"></div>
+                    <input type="text" class="search-input" placeholder="搜索资料...">
+                </div>
+                
+                <div class="category-grid">
+                    <a href="document-standards.html" style="text-decoration: none;">
+                        <div class="category-card">
+                            <div class="category-icon">
+                                <img src="http://www.qd-metro.com/images/logo.png" alt="标准">
+                            </div>
+                            <div class="category-title">标准</div>
+                            <div class="category-count">42 个文件</div>
+                        </div>
+                    </a>
+                    
+                    <a href="document-guides.html" style="text-decoration: none;">
+                        <div class="category-card">
+                            <div class="category-icon">
+                                <img src="http://www.qd-metro.com/images/logo.png" alt="指导书">
+                            </div>
+                            <div class="category-title">指导书</div>
+                            <div class="category-count">28 个文件</div>
+                        </div>
+                    </a>
+                    
+                    <a href="document-process.html" style="text-decoration: none;">
+                        <div class="category-card">
+                            <div class="category-icon">
+                                <img src="http://www.qd-metro.com/images/logo.png" alt="工艺文件">
+                            </div>
+                            <div class="category-title">工艺文件</div>
+                            <div class="category-count">35 个文件</div>
+                        </div>
+                    </a>
+                    
+                    <a href="document-manuals.html" style="text-decoration: none;">
+                        <div class="category-card">
+                            <div class="category-icon">
+                                <img src="http://www.qd-metro.com/images/logo.png" alt="指导手册">
+                            </div>
+                            <div class="category-title">指导手册</div>
+                            <div class="category-count">19 个文件</div>
+                        </div>
+                    </a>
+                </div>
+                
+                <div class="recent-section">
+                    <div class="recent-title">最近查看</div>
+                    
+                    <div class="recent-list">
+                        <div class="document-item">
+                            <div class="document-icon">
+                                <img src="http://www.qd-metro.com/images/logo.png" alt="文档">
+                            </div>
+                            <div class="document-info">
+                                <div class="document-title">信号系统维修手册 V2.3</div>
+                                <div class="document-meta">
+                                    <span>指导手册</span>
+                                    <span>今天 10:25</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="document-item">
+                            <div class="document-icon">
+                                <img src="http://www.qd-metro.com/images/logo.png" alt="文档">
+                            </div>
+                            <div class="document-info">
+                                <div class="document-title">车门系统检修工艺规程</div>
+                                <div class="document-meta">
+                                    <span>工艺文件</span>
+                                    <span>昨天 14:30</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="document-item">
+                            <div class="document-icon">
+                                <img src="http://www.qd-metro.com/images/logo.png" alt="文档">
+                            </div>
+                            <div class="document-info">
+                                <div class="document-title">地铁车辆检修标准 2025版</div>
+                                <div class="document-meta">
+                                    <span>标准</span>
+                                    <span>3天前</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tab-bar">
+            <a href="ai-assistant.html" class="ai-assistant-button">
+                <div class="ai-assistant-icon">
+                    <img src="http://www.qd-metro.com/images/logo.png" alt="AI">
+                </div>
+                智能助手
+            </a>
+        </div>
+    </div>
+</body>
+</html> 

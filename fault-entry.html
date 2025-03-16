@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>故障维修录入 - 地铁检修APP</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 375px;
+            height: 812px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 40px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        
+        .status-bar {
+            height: 44px;
+            background-color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0 20px;
+            position: relative;
+        }
+        
+        .time {
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .status-icons {
+            display: flex;
+            gap: 5px;
+            position: absolute;
+            right: 20px;
+        }
+        
+        .status-icon {
+            width: 18px;
+            height: 18px;
+            background-color: #333;
+            border-radius: 50%;
+        }
+        
+        .header {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            background-color: #00743B;
+            color: white;
+            justify-content: center;
+            position: relative;
+        }
+        
+        .back-button {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            left: 20px;
+            cursor: pointer;
+        }
+        
+        .back-button:before {
+            content: '';
+            width: 10px;
+            height: 10px;
+            border-left: 2px solid white;
+            border-bottom: 2px solid white;
+            transform: rotate(45deg);
+            margin-left: 5px;
+        }
+        
+        .title {
+            font-size: 20px;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        .content {
+            height: calc(100% - 44px - 70px);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+        
+        .entry-section {
+            flex: 1;
+            padding: 20px;
+            background-color: #f9f9f9;
+            overflow-y: auto;
+        }
+        
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            padding-left: 15px;
+        }
+        
+        .section-title:before {
+            content: '';
+            display: inline-block;
+            width: 3px;
+            height: 16px;
+            background-color: #00743B;
+            position: absolute;
+            left: 0;
+            border-radius: 2px;
+        }
+        
+        .entry-form {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background-color: white;
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            width: 100%;
+            margin: 0 auto;
+        }
+        
+        .form-group {
+            display: flex;
+            border-bottom: 1px solid #f0f0f0;
+            padding-bottom: 10px;
+            align-items: center;
+            justify-content: flex-start;
+        }
+        
+        .form-label {
+            width: 90px;
+            font-size: 14px;
+            color: #666;
+            flex-shrink: 0;
+            text-align: left;
+            padding-right: 5px;
+        }
+        
+        .form-input {
+            width: 200px;
+            height: 34px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 0 8px;
+            font-size: 14px;
+            color: #333;
+        }
+        
+        .form-select {
+            width: 200px;
+            height: 34px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 0 8px;
+            font-size: 14px;
+            color: #333;
+            background-color: white;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23888' d='M6 8.825L1.175 4 2.05 3.125 6 7.075 9.95 3.125 10.825 4z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 8px center;
+        }
+        
+        .form-textarea {
+            width: 200px;
+            height: 60px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 8px;
+            font-size: 14px;
+            color: #333;
+            resize: none;
+        }
+        
+        .radio-group {
+            flex: 1;
+            display: flex;
+            gap: 20px;
+        }
+        
+        .radio-option {
+            display: flex;
+            align-items: center;
+        }
+        
+        .radio-input {
+            margin-right: 5px;
+        }
+        
+        .tab-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 80px;
+            background-color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-top: 1px solid #eee;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .ai-assistant-button {
+            width: 160px;
+            height: 50px;
+            background: linear-gradient(135deg, #00743B, #009E50);
+            border-radius: 25px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 5px 15px rgba(0, 115, 59, 0.3);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .ai-assistant-icon {
+            width: 24px;
+            height: 24px;
+            margin-right: 8px;
+            background-color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .ai-assistant-icon img {
+            width: 18px;
+            height: 18px;
+            object-fit: contain;
+            display: block;
+            margin: 0 auto;
+        }
+        
+        .submit-button {
+            width: 100%;
+            height: 44px;
+            background: linear-gradient(135deg, #00743B, #009E50);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            margin-top: 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .submit-button:hover {
+            box-shadow: 0 5px 15px rgba(0, 115, 59, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="status-bar">
+            <div class="time">9:41</div>
+            <div class="status-icons">
+                <div class="status-icon"></div>
+                <div class="status-icon"></div>
+                <div class="status-icon"></div>
+            </div>
+        </div>
+        
+        <div class="content">
+            <div class="header">
+                <a href="index.html" class="back-button"></a>
+                <div class="title">故障维修录入</div>
+            </div>
+            
+            <div class="entry-section">
+                <div class="section-title">录入信息</div>
+                
+                <div class="entry-form">
+                    <div class="form-group">
+                        <div class="form-label">日期</div>
+                        <input type="date" class="form-input">
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="form-label">月份</div>
+                        <select class="form-select">
+                            <option value="">请选择</option>
+                            <option value="1">1月</option>
+                            <option value="2">2月</option>
+                            <option value="3">3月</option>
+                            <option value="4">4月</option>
+                            <option value="5">5月</option>
+                            <option value="6">6月</option>
+                            <option value="7">7月</option>
+                            <option value="8">8月</option>
+                            <option value="9">9月</option>
+                            <option value="10">10月</option>
+                            <option value="11">11月</option>
+                            <option value="12">12月</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="form-label">修程</div>
+                        <select class="form-select">
+                            <option value="">请选择</option>
+                            <option value="一级修程">一级修程</option>
+                            <option value="二级修程">二级修程</option>
+                            <option value="三级修程">三级修程</option>
+                            <option value="临时修程">临时修程</option>
+                            <option value="里程专项修">里程专项修</option>
+                            <option value="系统修">系统修</option>
+                            <option value="日常保洁">日常保洁</option>
+                            <option value="施工普查">施工普查</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="form-label">车辆号</div>
+                        <input type="text" class="form-input" placeholder="请输入车辆号">
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="form-label">车厢号</div>
+                        <input type="text" class="form-input" placeholder="请输入车厢号">
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="form-label">故障系统</div>
+                        <select class="form-select">
+                            <option value="">请选择</option>
+                            <option value="信号系统">信号系统</option>
+                            <option value="供电系统">供电系统</option>
+                            <option value="车门系统">车门系统</option>
+                            <option value="空调系统">空调系统</option>
+                            <option value="制动系统">制动系统</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="form-label">责任班组</div>
+                        <input type="text" class="form-input" placeholder="请输入责任班组">
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="form-label">问题描述</div>
+                        <textarea class="form-textarea" placeholder="请详细描述故障问题"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="form-label">问题属性</div>
+                        <select class="form-select">
+                            <option value="">请选择</option>
+                            <option value="硬件故障">硬件故障</option>
+                            <option value="软件故障">软件故障</option>
+                            <option value="人为损坏">人为损坏</option>
+                            <option value="正常磨损">正常磨损</option>
+                            <option value="其他">其他</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="form-label">整改进度</div>
+                        <textarea class="form-textarea" placeholder="请输入整改进度或处置建议"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="form-label">开口项工区处置建议</div>
+                        <textarea class="form-textarea" placeholder="请输入开口项工区处置建议"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="form-label">发现人</div>
+                        <input type="text" class="form-input" placeholder="请输入发现人">
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="form-label">处理人</div>
+                        <input type="text" class="form-input" placeholder="请输入处理人">
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="form-label">检查内容</div>
+                        <textarea class="form-textarea" placeholder="请输入检查内容"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="form-label">是否闭环</div>
+                        <div class="radio-group">
+                            <div class="radio-option">
+                                <input type="radio" id="closed-yes" name="closed" class="radio-input">
+                                <label for="closed-yes">是</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="closed-no" name="closed" class="radio-input">
+                                <label for="closed-no">否</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="form-label">问题分类</div>
+                        <select class="form-select">
+                            <option value="">请选择</option>
+                            <option value="外观类">外观类</option>
+                            <option value="状态类">状态类</option>
+                            <option value="螺栓安装类">螺栓安装类</option>
+                            <option value="防松涂打类">防松涂打类</option>
+                            <option value="缺项漏项类">缺项漏项类</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="form-label">问题分类（一级）</div>
+                        <select class="form-select">
+                            <option value="">请选择</option>
+                            <option value="设备故障">设备故障</option>
+                            <option value="人为因素">人为因素</option>
+                            <option value="环境因素">环境因素</option>
+                            <option value="材料问题">材料问题</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="form-label">问题分类（二级）</div>
+                        <select class="form-select">
+                            <option value="">请选择</option>
+                            <option value="电子元件故障">电子元件故障</option>
+                            <option value="机械部件故障">机械部件故障</option>
+                            <option value="软件系统故障">软件系统故障</option>
+                            <option value="连接部件故障">连接部件故障</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="form-label">质检问题等级分类</div>
+                        <select class="form-select">
+                            <option value="">请选择</option>
+                            <option value="A级">A级</option>
+                            <option value="B级">B级</option>
+                            <option value="C级">C级</option>
+                            <option value="D级">D级</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="form-label">备注</div>
+                        <textarea class="form-textarea" placeholder="请输入备注信息"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="form-label">复查结果</div>
+                        <div class="radio-group">
+                            <div class="radio-option">
+                                <input type="radio" id="review-yes" name="review" class="radio-input">
+                                <label for="review-yes">是</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="review-no" name="review" class="radio-input">
+                                <label for="review-no">否</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button class="submit-button">提交</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tab-bar">
+            <a href="ai-assistant.html" class="ai-assistant-button">
+                <div class="ai-assistant-icon">
+                    <img src="http://www.qd-metro.com/images/logo.png" alt="AI">
+                </div>
+                智能助手
+            </a>
+        </div>
+    </div>
+</body>
+</html> 

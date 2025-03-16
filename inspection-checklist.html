@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>验收必检项 - 地铁检修APP</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 375px;
+            height: 812px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 40px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        
+        .status-bar {
+            height: 44px;
+            background-color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0 20px;
+            position: relative;
+        }
+        
+        .time {
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .status-icons {
+            display: flex;
+            gap: 5px;
+            position: absolute;
+            right: 20px;
+        }
+        
+        .status-icon {
+            width: 18px;
+            height: 18px;
+            background-color: #333;
+            border-radius: 50%;
+        }
+        
+        .header {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            background-color: #00743B;
+            color: white;
+            justify-content: center;
+            position: relative;
+        }
+        
+        .back-button {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            left: 20px;
+            cursor: pointer;
+        }
+        
+        .back-button:before {
+            content: '';
+            width: 10px;
+            height: 10px;
+            border-left: 2px solid white;
+            border-bottom: 2px solid white;
+            transform: rotate(45deg);
+            margin-left: 5px;
+        }
+        
+        .title {
+            font-size: 20px;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        .content {
+            height: calc(100% - 44px - 70px);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+        
+        .checklist-section {
+            flex: 1;
+            padding: 20px;
+            background-color: #f9f9f9;
+            overflow-y: auto;
+        }
+        
+        .filter-section {
+            background-color: white;
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 115, 59, 0.08);
+        }
+        
+        .filter-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .filter-title:before {
+            content: '';
+            display: inline-block;
+            width: 3px;
+            height: 16px;
+            background-color: #00743B;
+            margin-right: 8px;
+            border-radius: 2px;
+        }
+        
+        .search-bar {
+            display: flex;
+            background-color: #f5f5f5;
+            border-radius: 10px;
+            padding: 10px 15px;
+            margin-bottom: 15px;
+            align-items: center;
+        }
+        
+        .search-icon {
+            width: 20px;
+            height: 20px;
+            background-color: #ddd;
+            border-radius: 50%;
+            margin-right: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+        
+        .search-icon:before {
+            content: '';
+            width: 10px;
+            height: 10px;
+            border: 2px solid #999;
+            border-radius: 50%;
+            position: absolute;
+            left: 3px;
+            top: 3px;
+        }
+        
+        .search-icon:after {
+            content: '';
+            width: 6px;
+            height: 2px;
+            background-color: #999;
+            position: absolute;
+            transform: rotate(45deg);
+            bottom: 5px;
+            right: 4px;
+        }
+        
+        .search-input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            font-size: 14px;
+            color: #333;
+            outline: none;
+        }
+        
+        .filter-group {
+            margin-bottom: 15px;
+        }
+        
+        .filter-label {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+        
+        .select-container {
+            position: relative;
+        }
+        
+        .filter-select {
+            width: 100%;
+            height: 42px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 0 15px;
+            background-color: white;
+            font-size: 14px;
+            color: #333;
+            appearance: none;
+            outline: none;
+        }
+        
+        .select-arrow {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 10px;
+            height: 10px;
+            border-right: 2px solid #999;
+            border-bottom: 2px solid #999;
+            transform: translateY(-50%) rotate(45deg);
+            pointer-events: none;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+        }
+        
+        .checkbox {
+            width: 18px;
+            height: 18px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            margin-right: 8px;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .checkbox.checked {
+            background-color: #00743B;
+            border-color: #00743B;
+        }
+        
+        .checkbox.checked:after {
+            content: '';
+            position: absolute;
+            width: 5px;
+            height: 10px;
+            border-right: 2px solid white;
+            border-bottom: 2px solid white;
+            transform: rotate(45deg);
+            top: 1px;
+            left: 5px;
+        }
+        
+        .checkbox-label {
+            font-size: 14px;
+            color: #333;
+        }
+        
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .filter-button {
+            flex: 1;
+            height: 40px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+        
+        .reset-button {
+            background-color: #f5f5f5;
+            color: #666;
+            border: 1px solid #ddd;
+        }
+        
+        .search-button {
+            background-color: #00743B;
+            color: white;
+            border: none;
+        }
+        
+        .result-section {
+            margin-top: 20px;
+        }
+        
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .result-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            display: flex;
+            align-items: center;
+        }
+        
+        .result-title:before {
+            content: '';
+            display: inline-block;
+            width: 3px;
+            height: 16px;
+            background-color: #00743B;
+            margin-right: 8px;
+            border-radius: 2px;
+        }
+        
+        .result-count {
+            font-size: 14px;
+            color: #999;
+        }
+        
+        .checklist-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .checklist-card {
+            background-color: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 115, 59, 0.08);
+        }
+        
+        .checklist-header {
+            background-color: #00743B;
+            color: white;
+            padding: 12px 15px;
+        }
+        
+        .checklist-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
+        
+        .checklist-items {
+            padding: 15px;
+        }
+        
+        .checklist-item {
+            display: flex;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .checklist-item:last-child {
+            border-bottom: none;
+        }
+        
+        .item-checkbox {
+            width: 22px;
+            height: 22px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            margin-right: 12px;
+            flex-shrink: 0;
+            position: relative;
+        }
+        
+        .item-checkbox.checked {
+            background-color: #00743B;
+            border-color: #00743B;
+        }
+        
+        .item-checkbox.checked:after {
+            content: '';
+            position: absolute;
+            width: 5px;
+            height: 10px;
+            border-right: 2px solid white;
+            border-bottom: 2px solid white;
+            transform: rotate(45deg);
+            top: 3px;
+            left: 7px;
+        }
+        
+        .item-content {
+            flex: 1;
+        }
+        
+        .item-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .item-desc {
+            font-size: 13px;
+            color: #666;
+        }
+        
+        .item-standard {
+            font-size: 12px;
+            color: #00743B;
+            background-color: #e6f2ec;
+            padding: 2px 8px;
+            border-radius: 10px;
+            display: inline-block;
+            margin-top: 5px;
+        }
+        
+        .completion-bar {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+        
+        .progress-bar {
+            flex: 1;
+            height: 6px;
+            background-color: #f0f0f0;
+            border-radius: 3px;
+            margin-right: 10px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background-color: #00743B;
+            border-radius: 3px;
+        }
+        
+        .completion-text {
+            font-size: 12px;
+            color: #666;
+            white-space: nowrap;
+        }
+        
+        .tab-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 80px;
+            background-color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-top: 1px solid #eee;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .ai-assistant-button {
+            width: 160px;
+            height: 50px;
+            background: linear-gradient(135deg, #00743B, #009E50);
+            border-radius: 25px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 5px 15px rgba(0, 115, 59, 0.3);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .ai-assistant-icon {
+            width: 24px;
+            height: 24px;
+            margin-right: 8px;
+            background-color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .ai-assistant-icon img {
+            width: 18px;
+            height: 18px;
+            object-fit: contain;
+            display: block;
+            margin: 0 auto;
+        }
+        
+        .submit-button {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 180px;
+            height: 50px;
+            background-color: #00743B;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 5px 15px rgba(0, 115, 59, 0.3);
+            z-index: 10;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="status-bar">
+            <div class="time">9:41</div>
+            <div class="status-icons">
+                <div class="status-icon"></div>
+                <div class="status-icon"></div>
+                <div class="status-icon"></div>
+            </div>
+        </div>
+        
+        <div class="content">
+            <div class="header">
+                <a href="index.html" class="back-button"></a>
+                <div class="title">质检小组工作包</div>
+            </div>
+            
+            <div class="checklist-section">
+                <div class="filter-section">
+                    <div class="filter-title">筛选条件</div>
+                    
+                    <div class="search-bar">
+                        <div class="search-icon"></div>
+                        <input type="text" class="search-input" placeholder="搜索关键词...">
+                    </div>
+                    
+                    <div class="filter-group">
+                        <div class="filter-label">修程</div>
+                        <div class="select-container">
+                            <select class="filter-select">
+                                <option value="">请选择修程</option>
+                                <option value="1">日检</option>
+                                <option value="2">周检</option>
+                                <option value="3">月检</option>
+                                <option value="4">季检</option>
+                                <option value="5">年检</option>
+                            </select>
+                            <div class="select-arrow"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <div class="filter-label">车型</div>
+                        <div class="select-container">
+                            <select class="filter-select">
+                                <option value="">请选择车型</option>
+                                <option value="1">一号线列车</option>
+                                <option value="2">二号线列车</option>
+                                <option value="3">三号线列车</option>
+                                <option value="4">四号线列车</option>
+                            </select>
+                            <div class="select-arrow"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <div class="filter-label">系统类型</div>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <div class="checkbox checked"></div>
+                                <div class="checkbox-label">车辆系统</div>
+                            </div>
+                            <div class="checkbox-item">
+                                <div class="checkbox"></div>
+                                <div class="checkbox-label">信号系统</div>
+                            </div>
+                            <div class="checkbox-item">
+                                <div class="checkbox"></div>
+                                <div class="checkbox-label">供电系统</div>
+                            </div>
+                            <div class="checkbox-item">
+                                <div class="checkbox"></div>
+                                <div class="checkbox-label">通信系统</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="filter-buttons">
+                        <div class="filter-button reset-button">重置</div>
+                        <div class="filter-button search-button">查询</div>
+                    </div>
+                </div>
+                
+                <div class="result-section">
+                    <div class="result-header">
+                        <div class="result-title">检查项目</div>
+                        <div class="result-count">共12项</div>
+                    </div>
+                    
+                    <div class="checklist-list">
+                        <div class="checklist-card">
+                            <div class="checklist-header">
+                                <div class="checklist-title">运行装置</div>
+                            </div>
+                            <div class="checklist-items">
+                                <div class="checklist-item">
+                                    <div class="item-checkbox checked"></div>
+                                    <div class="item-content">
+                                        <div class="item-title">轮对轮径尺寸检查</div>
+                                        <div class="item-desc">检查轮对直径是否在标准范围内，轮缘磨损是否超限</div>
+                                        <div class="item-standard">标准: 840±3mm</div>
+                                    </div>
+                                </div>
+                                <div class="checklist-item">
+                                    <div class="item-checkbox"></div>
+                                    <div class="item-content">
+                                        <div class="item-title">轴承温度检测</div>
+                                        <div class="item-desc">检查轴承箱温度是否正常，无异常发热现象</div>
+                                        <div class="item-standard">标准: ≤65℃</div>
+                                    </div>
+                                </div>
+                                <div class="checklist-item">
+                                    <div class="item-checkbox"></div>
+                                    <div class="item-content">
+                                        <div class="item-title">轮对踏面检查</div>
+                                        <div class="item-desc">检查踏面是否有裂纹、剥离、不均匀磨损等缺陷</div>
+                                        <div class="item-standard">标准: 无明显缺陷</div>
+                                    </div>
+                                </div>
+                                <div class="completion-bar">
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 33%"></div>
+                                    </div>
+                                    <div class="completion-text">已完成 1/3 项</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="checklist-card">
+                            <div class="checklist-header">
+                                <div class="checklist-title">车门系统</div>
+                            </div>
+                            <div class="checklist-items">
+                                <div class="checklist-item">
+                                    <div class="item-checkbox"></div>
+                                    <div class="item-content">
+                                        <div class="item-title">车门开关功能测试</div>
+                                        <div class="item-desc">检查车门开关是否灵活，无卡滞现象</div>
+                                        <div class="item-standard">标准: 开关时间3-5秒</div>
+                                    </div>
+                                </div>
+                                <div class="checklist-item">
+                                    <div class="item-checkbox"></div>
+                                    <div class="item-content">
+                                        <div class="item-title">防夹功能测试</div>
+                                        <div class="item-desc">检查防夹保护功能是否正常工作</div>
+                                        <div class="item-standard">标准: 力度≤150N</div>
+                                    </div>
+                                </div>
+                                <div class="completion-bar">
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 0%"></div>
+                                    </div>
+                                    <div class="completion-text">已完成 0/2 项</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="checklist-card">
+                            <div class="checklist-header">
+                                <div class="checklist-title">空调系统</div>
+                            </div>
+                            <div class="checklist-items">
+                                <div class="checklist-item">
+                                    <div class="item-checkbox"></div>
+                                    <div class="item-content">
+                                        <div class="item-title">空调制冷效果测试</div>
+                                        <div class="item-desc">检查空调制冷效果是否达标</div>
+                                        <div class="item-standard">标准: 车内温度22-26℃</div>
+                                    </div>
+                                </div>
+                                <div class="checklist-item">
+                                    <div class="item-checkbox"></div>
+                                    <div class="item-content">
+                                        <div class="item-title">出风口气流检查</div>
+                                        <div class="item-desc">检查各出风口气流是否均匀</div>
+                                        <div class="item-standard">标准: 风速0.3-0.5m/s</div>
+                                    </div>
+                                </div>
+                                <div class="completion-bar">
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 0%"></div>
+                                    </div>
+                                    <div class="completion-text">已完成 0/2 项</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tab-bar">
+            <a href="ai-assistant.html" class="ai-assistant-button">
+                <div class="ai-assistant-icon">
+                    <img src="http://www.qd-metro.com/images/logo.png" alt="AI">
+                </div>
+                智能助手
+            </a>
+        </div>
+    </div>
+</body>
+</html> 

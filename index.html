@@ -1,0 +1,1222 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>地铁检修APP原型</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .prototype-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .title {
+            text-align: center;
+            margin-bottom: 40px;
+            color: #00743B;
+            font-size: 28px;
+            font-weight: bold;
+            position: relative;
+            padding-bottom: 15px;
+        }
+        
+        .title:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background-color: #00743B;
+            border-radius: 3px;
+        }
+        
+        .screens-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            justify-content: center;
+        }
+        
+        .screen {
+            width: 375px;
+            height: 812px;
+            background-color: white;
+            border-radius: 40px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        
+        .status-bar {
+            height: 44px;
+            background-color: #ffffff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+        
+        .time {
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .status-icons {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .status-icon {
+            width: 18px;
+            height: 18px;
+            background-color: #333;
+            border-radius: 50%;
+        }
+        
+        .screen-content {
+            height: calc(100% - 44px);
+            overflow-y: auto;
+            position: relative;
+        }
+        
+        .splash-screen {
+            background-color: white;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #00743B;
+        }
+        
+        .app-logo {
+            width: 180px;
+            height: 180px;
+            background-color: white;
+            border-radius: 30px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 115, 59, 0.15);
+        }
+        
+        .app-logo-inner {
+            width: 150px;
+            height: 150px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .metro-logo {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        
+        .app-name {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #00743B;
+        }
+        
+        .app-slogan {
+            font-size: 18px;
+            color: #00743B;
+            opacity: 0.8;
+            text-align: center;
+            max-width: 80%;
+        }
+        
+        .login-screen {
+            padding: 40px 30px;
+        }
+        
+        .login-title {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 40px;
+            color: #333;
+        }
+        
+        .input-group {
+            margin-bottom: 25px;
+        }
+        
+        .input-label {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+        
+        .input-field {
+            width: 100%;
+            height: 50px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 0 15px;
+            font-size: 16px;
+        }
+        
+        .login-button {
+            width: 100%;
+            height: 50px;
+            background-color: #00743B;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            margin-top: 20px;
+            cursor: pointer;
+        }
+        
+        .home-screen {
+            padding: 20px;
+            background-color: white;
+            height: calc(100% - 80px); /* 减去底部导航栏的高度 */
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .welcome-section {
+            margin-bottom: 20px;
+            background-color: #f8f8f8;
+            padding: 15px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .welcome-text {
+            font-size: 22px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 3px;
+        }
+        
+        .date-text {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .feature-card {
+            background-color: white;
+            border-radius: 15px;
+            padding: 20px 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 0 5px 15px rgba(0, 115, 59, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 115, 59, 0.15);
+        }
+        
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background-color: #f8f8f8;
+            border-radius: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+        
+        .feature-icon img {
+            width: 50px;
+            height: 50px;
+            object-fit: contain;
+        }
+        
+        .feature-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            text-align: center;
+            margin-top: 5px;
+        }
+        
+        .quick-access {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .section-title:before {
+            content: '';
+            display: inline-block;
+            width: 4px;
+            height: 20px;
+            background-color: #00743B;
+            margin-right: 10px;
+            border-radius: 2px;
+        }
+        
+        .quick-access-list {
+            display: flex;
+            overflow-x: auto;
+            gap: 12px;
+            padding-bottom: 5px;
+            flex: 1;
+        }
+        
+        .quick-access-item {
+            min-width: 160px;
+            background-color: white;
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 5px 15px rgba(0, 115, 59, 0.08);
+            transition: transform 0.3s ease;
+        }
+        
+        .quick-access-item:hover {
+            transform: translateY(-3px);
+        }
+        
+        .quick-access-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #00743B;
+            margin-bottom: 8px;
+        }
+        
+        .quick-access-desc {
+            font-size: 13px;
+            color: #666;
+        }
+        
+        .tab-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 80px;
+            background-color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-top: 1px solid #eee;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .ai-assistant-button {
+            width: 160px;
+            height: 50px;
+            background: linear-gradient(135deg, #00743B, #009E50);
+            border-radius: 25px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 5px 15px rgba(0, 115, 59, 0.3);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .ai-assistant-button:before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0));
+            border-radius: 50%;
+            transform: scale(0);
+            transition: transform 0.5s ease;
+        }
+        
+        .ai-assistant-button:hover:before {
+            transform: scale(1);
+        }
+        
+        .ai-assistant-button:after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 15px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            bottom: -15px;
+            left: 0;
+            animation: shine 2s infinite;
+        }
+        
+        @keyframes shine {
+            0% {
+                bottom: -15px;
+            }
+            50% {
+                bottom: 40px;
+            }
+            100% {
+                bottom: 40px;
+            }
+        }
+        
+        .ai-assistant-icon {
+            width: 24px;
+            height: 24px;
+            margin-right: 8px;
+            background-color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .ai-assistant-icon img {
+            width: 18px;
+            height: 18px;
+            object-fit: contain;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .back-button {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .page-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .search-bar {
+            display: flex;
+            background-color: #f5f5f5;
+            border-radius: 10px;
+            padding: 10px 15px;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+        
+        .search-icon {
+            width: 20px;
+            height: 20px;
+            background-color: #999;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        
+        .search-input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            font-size: 16px;
+            color: #333;
+        }
+        
+        .filter-options {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+        }
+        
+        .filter-option {
+            padding: 8px 15px;
+            background-color: #f0f0f0;
+            border-radius: 20px;
+            font-size: 14px;
+            color: #666;
+            white-space: nowrap;
+        }
+        
+        .filter-option.active {
+            background-color: #00743B;
+            color: white;
+        }
+        
+        .record-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .record-card {
+            background-color: white;
+            border-radius: 15px;
+            padding: 18px;
+            box-shadow: 0 5px 15px rgba(0, 115, 59, 0.08);
+            transition: transform 0.3s ease;
+            border-left: 4px solid #00743B;
+        }
+        
+        .record-card:hover {
+            transform: translateY(-3px);
+        }
+        
+        .record-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        
+        .record-id {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .record-status {
+            font-size: 14px;
+            padding: 4px 10px;
+            border-radius: 15px;
+        }
+        
+        .status-resolved {
+            background-color: #e6f2ec;
+            color: #00743B;
+        }
+        
+        .status-pending {
+            background-color: #fff7e6;
+            color: #fa8c16;
+        }
+        
+        .record-info {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+        
+        .info-item {
+            display: flex;
+            font-size: 14px;
+        }
+        
+        .info-label {
+            color: #999;
+            width: 80px;
+        }
+        
+        .info-value {
+            color: #333;
+            flex: 1;
+        }
+        
+        .record-footer {
+            display: flex;
+            justify-content: flex-end;
+        }
+        
+        .view-details {
+            font-size: 14px;
+            color: #00743B;
+        }
+        
+        .detail-section {
+            margin-bottom: 30px;
+        }
+        
+        .detail-header {
+            background-color: #f8f8f8;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .detail-content {
+            padding: 0 10px;
+        }
+        
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 10px;
+            top: 0;
+            height: 100%;
+            width: 2px;
+            background-color: #ddd;
+        }
+        
+        .timeline-item {
+            position: relative;
+            padding-bottom: 20px;
+        }
+        
+        .timeline-dot {
+            position: absolute;
+            left: -30px;
+            top: 0;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: #00743B;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .timeline-dot::after {
+            content: '';
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: white;
+        }
+        
+        .timeline-content {
+            background-color: #f8f8f8;
+            border-radius: 10px;
+            padding: 15px;
+        }
+        
+        .timeline-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .timeline-time {
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 10px;
+        }
+        
+        .timeline-desc {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .category-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .category-card {
+            background-color: white;
+            border-radius: 15px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .category-icon {
+            width: 50px;
+            height: 50px;
+            background-color: #e6f2ec;
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 15px;
+        }
+        
+        .category-icon-inner {
+            width: 30px;
+            height: 30px;
+            background-color: #00743B;
+            border-radius: 8px;
+        }
+        
+        .category-info {
+            flex: 1;
+        }
+        
+        .category-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .category-desc {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .category-count {
+            font-size: 14px;
+            color: #00743B;
+            font-weight: 600;
+        }
+        
+        .document-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .document-card {
+            background-color: white;
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .document-type {
+            font-size: 12px;
+            color: #00743B;
+            background-color: #e6f2ec;
+            padding: 4px 8px;
+            border-radius: 4px;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+        
+        .document-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .document-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #999;
+        }
+        
+        .checklist-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .checklist-card {
+            background-color: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .checklist-header {
+            background-color: #00743B;
+            color: white;
+            padding: 15px;
+        }
+        
+        .checklist-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .checklist-subtitle {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+        
+        .checklist-items {
+            padding: 15px;
+        }
+        
+        .checklist-item {
+            display: flex;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .checklist-item:last-child {
+            border-bottom: none;
+        }
+        
+        .checkbox {
+            width: 24px;
+            height: 24px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        
+        .checkbox.checked {
+            background-color: #00743B;
+            border-color: #00743B;
+            position: relative;
+        }
+        
+        .checkbox.checked::after {
+            content: '';
+            position: absolute;
+            width: 6px;
+            height: 12px;
+            border-right: 2px solid white;
+            border-bottom: 2px solid white;
+            transform: rotate(45deg);
+            top: 3px;
+            left: 8px;
+        }
+        
+        .item-content {
+            flex: 1;
+        }
+        
+        .item-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .item-desc {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .form-container {
+            padding: 20px;
+        }
+        
+        .form-section {
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+        
+        .form-input {
+            width: 100%;
+            height: 50px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 0 15px;
+            font-size: 16px;
+        }
+        
+        .form-textarea {
+            width: 100%;
+            height: 120px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 15px;
+            font-size: 16px;
+            resize: none;
+        }
+        
+        .form-select {
+            width: 100%;
+            height: 50px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 0 15px;
+            font-size: 16px;
+            background-color: white;
+        }
+        
+        .radio-group {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .radio-option {
+            display: flex;
+            align-items: center;
+        }
+        
+        .radio {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ddd;
+            border-radius: 50%;
+            margin-right: 8px;
+            position: relative;
+        }
+        
+        .radio.selected {
+            border-color: #00743B;
+        }
+        
+        .radio.selected::after {
+            content: '';
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: #00743B;
+            border-radius: 50%;
+            top: 3px;
+            left: 3px;
+        }
+        
+        .radio-label {
+            font-size: 14px;
+            color: #333;
+        }
+        
+        .photo-upload {
+            width: 100%;
+            height: 150px;
+            border: 2px dashed #ddd;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .upload-icon {
+            width: 40px;
+            height: 40px;
+            background-color: #f5f5f5;
+            border-radius: 50%;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .upload-text {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .submit-button {
+            width: 100%;
+            height: 50px;
+            background-color: #00743B;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+        }
+        
+        .profile-header {
+            background-color: #00743B;
+            padding: 30px 20px;
+            color: white;
+            border-radius: 0 0 30px 30px;
+            margin-bottom: 30px;
+        }
+        
+        .profile-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            background-color: white;
+            border-radius: 50%;
+            margin-right: 20px;
+        }
+        
+        .profile-name {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .profile-role {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        
+        .stats-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        
+        .stat-item {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+        
+        .menu-list {
+            padding: 0 20px;
+        }
+        
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .menu-icon {
+            width: 40px;
+            height: 40px;
+            background-color: #f5f5f5;
+            border-radius: 10px;
+            margin-right: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .menu-title {
+            flex: 1;
+            font-size: 16px;
+            color: #333;
+        }
+        
+        .menu-arrow {
+            width: 20px;
+            height: 20px;
+            position: relative;
+        }
+        
+        .menu-arrow::after {
+            content: '';
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border-top: 2px solid #999;
+            border-right: 2px solid #999;
+            transform: rotate(45deg);
+            top: 6px;
+            right: 6px;
+        }
+        
+        .screen-label {
+            position: absolute;
+            bottom: -30px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="prototype-container">
+        <h1 class="title">地铁检修APP原型</h1>
+        
+        <div class="screens-container">
+            <!-- 启动页 -->
+            <div class="screen">
+                <div class="screen-content">
+                    <div class="splash-screen">
+                        <div class="app-logo">
+                            <div class="app-logo-inner">
+                                <img src="http://www.qd-metro.com/images/logo.png" alt="青岛地铁" class="metro-logo">
+                            </div>
+                        </div>
+                        <div class="app-name">地铁检修</div>
+                        <div class="app-slogan">高效、智能的地铁设备维护助手</div>
+                    </div>
+                </div>
+                <div class="screen-label">启动页</div>
+            </div>
+            
+            <!-- 登录页 -->
+            <div class="screen">
+                <div class="status-bar">
+                    <div class="time">9:41</div>
+                    <div class="status-icons">
+                        <div class="status-icon"></div>
+                        <div class="status-icon"></div>
+                        <div class="status-icon"></div>
+                    </div>
+                </div>
+                <div class="screen-content">
+                    <div class="login-screen">
+                        <div class="login-title">欢迎登录</div>
+
+                        <div class="input-group">
+                            <div class="input-label">工号</div>
+                            <input type="text" class="input-field" placeholder="请输入工号">
+                        </div>
+                        
+                        <div class="input-group">
+                            <div class="input-label">密码</div>
+                            <input type="password" class="input-field" placeholder="请输入密码">
+                        </div>
+                        
+                        <button class="login-button">登录</button>
+                    </div>
+                </div>
+                <div class="screen-label">登录页</div>
+            </div>
+            
+            <!-- 首页 -->
+            <div class="screen">
+                <div class="status-bar">
+                    <div class="time">9:41</div>
+                    <div class="status-icons">
+                        <div class="status-icon"></div>
+                        <div class="status-icon"></div>
+                        <div class="status-icon"></div>
+                    </div>
+                </div>
+                <div class="screen-content">
+                    <div class="home-screen">
+                        <div class="welcome-section">
+                            <div class="welcome-text">你好，张工</div>
+                            <div class="date-text" id="current-date"></div>
+                        </div>
+
+                        <div class="feature-grid">
+                            <div class="feature-card">
+                                <a href="fault-history.html" style="text-decoration: none; color: inherit;">
+                                    <div class="feature-icon">
+                                        <img src="http://www.qd-metro.com/images/logo.png" alt="青岛地铁">
+                                    </div>
+                                    <div class="feature-title">历史故障查询</div>
+                                </a>
+                            </div>
+                            <div class="feature-card">
+                                <a href="document-library.html" style="text-decoration: none; color: inherit;">
+                                    <div class="feature-icon">
+                                        <img src="http://www.qd-metro.com/images/logo.png" alt="青岛地铁">
+                                    </div>
+                                    <div class="feature-title">资料库</div>
+                                </a>
+                            </div>
+                            <div class="feature-card">
+                                <a href="inspection-checklist.html" style="text-decoration: none; color: inherit;">
+                                    <div class="feature-icon">
+                                        <img src="http://www.qd-metro.com/images/logo.png" alt="青岛地铁">
+                                    </div>
+                                    <div class="feature-title">质检小组工作包</div>
+                                </a>
+                            </div>
+                            <div class="feature-card">
+                                <a href="fault-entry.html" style="text-decoration: none; color: inherit;">
+                                    <div class="feature-icon">
+                                        <img src="http://www.qd-metro.com/images/logo.png" alt="青岛地铁">
+                                    </div>
+                                    <div class="feature-title">故障维修录入</div>
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <div class="quick-access">
+                            <div class="section-title">快速访问</div>
+                            <div class="quick-access-list">
+                                <div class="quick-access-item">
+                                    <div class="quick-access-title">信号系统维修手册</div>
+                                    <div class="quick-access-desc">最近访问：今天</div>
+                                </div>
+                                <div class="quick-access-item">
+                                    <div class="quick-access-title">车门故障检修流程</div>
+                                    <div class="quick-access-desc">最近访问：昨天</div>
+                                </div>
+                                <div class="quick-access-item">
+                                    <div class="quick-access-title">空调系统验收标准</div>
+                                    <div class="quick-access-desc">最近访问：3天前</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-bar">
+                        <a href="ai-assistant.html" class="ai-assistant-button">
+                            <div class="ai-assistant-icon">
+                                <img src="http://www.qd-metro.com/images/logo.png" alt="AI">
+                            </div>
+                            智能助手
+                        </a>
+                    </div>
+                </div>
+                <div class="screen-label">首页</div>
+            </div>
+
+            
+        </div>
+    </div>
+    
+    <script>
+        // 更新当前日期和星期
+        function updateCurrentDate() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = now.getMonth() + 1;
+            const day = now.getDate();
+            
+            // 获取星期几
+            const weekDays = ['日', '一', '二', '三', '四', '五', '六'];
+            const weekDay = weekDays[now.getDay()];
+            
+            // 格式化日期字符串
+            const dateStr = `${year}年${month}月${day}日 星期${weekDay}`;
+            
+            // 更新DOM元素
+            document.getElementById('current-date').textContent = dateStr;
+        }
+        
+        // 页面加载时初始化日期
+        document.addEventListener('DOMContentLoaded', function() {
+            updateCurrentDate();
+            // 每秒更新一次时间
+            setInterval(updateCurrentDate, 1000);
+        });
+    </script>
+</body>
+</html>

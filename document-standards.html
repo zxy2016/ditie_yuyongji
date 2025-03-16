@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>标准 - 地铁检修APP</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 375px;
+            height: 812px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 40px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        
+        .status-bar {
+            height: 44px;
+            background-color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0 20px;
+            position: relative;
+        }
+        
+        .time {
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .status-icons {
+            display: flex;
+            gap: 5px;
+            position: absolute;
+            right: 20px;
+        }
+        
+        .status-icon {
+            width: 18px;
+            height: 18px;
+            background-color: #333;
+            border-radius: 50%;
+        }
+        
+        .header {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            background-color: #00743B;
+            color: white;
+            justify-content: center;
+            position: relative;
+        }
+        
+        .back-button {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            left: 20px;
+            cursor: pointer;
+        }
+        
+        .back-button:before {
+            content: '';
+            width: 10px;
+            height: 10px;
+            border-left: 2px solid white;
+            border-bottom: 2px solid white;
+            transform: rotate(45deg);
+            margin-left: 5px;
+        }
+        
+        .title {
+            font-size: 20px;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        .content {
+            height: calc(100% - 44px - 70px);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+        
+        .standards-section {
+            flex: 1;
+            padding: 20px;
+            background-color: #f9f9f9;
+            overflow-y: auto;
+        }
+        
+        .search-bar {
+            display: flex;
+            background-color: white;
+            border-radius: 10px;
+            padding: 10px 15px;
+            margin-bottom: 20px;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .search-icon {
+            width: 20px;
+            height: 20px;
+            background-color: #ddd;
+            border-radius: 50%;
+            margin-right: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+        
+        .search-icon:before {
+            content: '';
+            width: 10px;
+            height: 10px;
+            border: 2px solid #999;
+            border-radius: 50%;
+            position: absolute;
+            left: 3px;
+            top: 3px;
+        }
+        
+        .search-icon:after {
+            content: '';
+            width: 6px;
+            height: 2px;
+            background-color: #999;
+            position: absolute;
+            transform: rotate(45deg);
+            bottom: 5px;
+            right: 4px;
+        }
+        
+        .search-input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            font-size: 14px;
+            color: #333;
+            outline: none;
+        }
+        
+        .filter-options {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+        }
+        
+        .filter-option {
+            padding: 8px 15px;
+            background-color: #f0f0f0;
+            border-radius: 20px;
+            font-size: 14px;
+            color: #666;
+            white-space: nowrap;
+        }
+        
+        .filter-option.active {
+            background-color: #00743B;
+            color: white;
+        }
+        
+        .standards-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .standard-card {
+            background-color: white;
+            border-radius: 15px;
+            padding: 18px;
+            box-shadow: 0 5px 15px rgba(0, 115, 59, 0.08);
+            transition: transform 0.3s ease;
+        }
+        
+        .standard-card:hover {
+            transform: translateY(-3px);
+        }
+        
+        .standard-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        
+        .standard-number {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .standard-status {
+            font-size: 14px;
+            padding: 4px 10px;
+            border-radius: 15px;
+        }
+        
+        .status-active {
+            background-color: #e6f2ec;
+            color: #00743B;
+        }
+        
+        .status-draft {
+            background-color: #fff7e6;
+            color: #fa8c16;
+        }
+        
+        .standard-info {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .info-item {
+            display: flex;
+            font-size: 14px;
+        }
+        
+        .info-label {
+            color: #999;
+            width: 80px;
+            flex-shrink: 0;
+        }
+        
+        .info-value {
+            color: #333;
+            flex: 1;
+        }
+        
+        .standard-footer {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 10px;
+        }
+        
+        .view-details {
+            font-size: 14px;
+            color: #00743B;
+            text-decoration: none;
+        }
+        
+        .tab-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 80px;
+            background-color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-top: 1px solid #eee;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .ai-assistant-button {
+            width: 160px;
+            height: 50px;
+            background: linear-gradient(135deg, #00743B, #009E50);
+            border-radius: 25px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 5px 15px rgba(0, 115, 59, 0.3);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .ai-assistant-icon {
+            width: 24px;
+            height: 24px;
+            margin-right: 8px;
+            background-color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .ai-assistant-icon img {
+            width: 18px;
+            height: 18px;
+            object-fit: contain;
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="status-bar">
+            <div class="time">9:41</div>
+            <div class="status-icons">
+                <div class="status-icon"></div>
+                <div class="status-icon"></div>
+                <div class="status-icon"></div>
+            </div>
+        </div>
+        
+        <div class="content">
+            <div class="header">
+                <a href="document-library.html" class="back-button"></a>
+                <div class="title">标准</div>
+            </div>
+            
+            <div class="standards-section">
+                <div class="search-bar">
+                    <div class="search-icon"></div>
+                    <input type="text" class="search-input" placeholder="搜索标准...">
+                </div>
+                
+                <div class="filter-options">
+                    <div class="filter-option active">全部</div>
+                    <div class="filter-option">国家标准</div>
+                    <div class="filter-option">行业标准</div>
+                    <div class="filter-option">企业标准</div>
+                    <div class="filter-option">地方标准</div>
+                </div>
+                
+                <div class="standards-list">
+                    <div class="standard-card">
+                        <div class="standard-header">
+                            <div class="standard-number">序号：001</div>
+                            <div class="standard-status status-active">有效</div>
+                        </div>
+                        <div class="standard-info">
+                            <div class="info-item">
+                                <div class="info-label">标准属性：</div>
+                                <div class="info-value">国家标准</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">标准名称：</div>
+                                <div class="info-value">城市轨道交通运营管理规范</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">标准编号：</div>
+                                <div class="info-value">GB/T 30012-2013</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">标准级别：</div>
+                                <div class="info-value">国家标准</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">编制部门：</div>
+                                <div class="info-value">国家标准化管理委员会</div>
+                            </div>
+                        </div>
+                        <div class="standard-footer">
+                            <a href="#" class="view-details">查看详情</a>
+                        </div>
+                    </div>
+                    
+                    <div class="standard-card">
+                        <div class="standard-header">
+                            <div class="standard-number">序号：002</div>
+                            <div class="standard-status status-active">有效</div>
+                        </div>
+                        <div class="standard-info">
+                            <div class="info-item">
+                                <div class="info-label">标准属性：</div>
+                                <div class="info-value">行业标准</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">标准名称：</div>
+                                <div class="info-value">城市轨道交通车辆检修规程</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">标准编号：</div>
+                                <div class="info-value">CJJ/T 198-2013</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">标准级别：</div>
+                                <div class="info-value">行业标准</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">编制部门：</div>
+                                <div class="info-value">住房和城乡建设部</div>
+                            </div>
+                        </div>
+                        <div class="standard-footer">
+                            <a href="#" class="view-details">查看详情</a>
+                        </div>
+                    </div>
+                    
+                    <div class="standard-card">
+                        <div class="standard-header">
+                            <div class="standard-number">序号：003</div>
+                            <div class="standard-status status-draft">草稿</div>
+                        </div>
+                        <div class="standard-info">
+                            <div class="info-item">
+                                <div class="info-label">标准属性：</div>
+                                <div class="info-value">企业标准</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">标准名称：</div>
+                                <div class="info-value">青岛地铁信号系统维护标准</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">标准编号：</div>
+                                <div class="info-value">QDM-ST-2025-001</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">标准级别：</div>
+                                <div class="info-value">企业标准</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">编制部门：</div>
+                                <div class="info-value">青岛地铁运营分公司</div>
+                            </div>
+                        </div>
+                        <div class="standard-footer">
+                            <a href="#" class="view-details">查看详情</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tab-bar">
+            <a href="ai-assistant.html" class="ai-assistant-button">
+                <div class="ai-assistant-icon">
+                    <img src="http://www.qd-metro.com/images/logo.png" alt="AI">
+                </div>
+                智能助手
+            </a>
+        </div>
+    </div>
+</body>
+</html> 

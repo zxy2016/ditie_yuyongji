@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能助手 - 地铁检修APP</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 375px;
+            height: 812px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 40px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        
+        .status-bar {
+            height: 44px;
+            background-color: #ffffff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+        
+        .time {
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .status-icons {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .status-icon {
+            width: 18px;
+            height: 18px;
+            background-color: #333;
+            border-radius: 50%;
+        }
+        
+        .header {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            background-color: #00743B;
+            color: white;
+        }
+        
+        .back-button {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 15px;
+            cursor: pointer;
+        }
+        
+        .back-button:before {
+            content: '';
+            width: 10px;
+            height: 10px;
+            border-left: 2px solid white;
+            border-bottom: 2px solid white;
+            transform: rotate(45deg);
+            margin-left: 5px;
+        }
+        
+        .title {
+            font-size: 20px;
+            font-weight: bold;
+        }
+        
+        .assistant-container {
+            height: calc(100% - 44px - 70px);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .chat-container {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background-color: #f9f9f9;
+        }
+        
+        .message {
+            margin-bottom: 20px;
+            max-width: 80%;
+        }
+        
+        .message.assistant {
+            margin-right: auto;
+        }
+        
+        .message.user {
+            margin-left: auto;
+        }
+        
+        .message-content {
+            padding: 15px;
+            border-radius: 18px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            position: relative;
+        }
+        
+        .message.assistant .message-content {
+            background-color: white;
+            border-bottom-left-radius: 5px;
+        }
+        
+        .message.user .message-content {
+            background-color: #00743B;
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+        
+        .message-time {
+            font-size: 12px;
+            color: #999;
+            margin-top: 5px;
+            text-align: right;
+        }
+        
+        .input-container {
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            border-top: 1px solid #eee;
+            background-color: white;
+        }
+        
+        .input-field {
+            flex: 1;
+            height: 40px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            padding: 0 15px;
+            font-size: 16px;
+            background-color: #f5f5f5;
+        }
+        
+        .send-button {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #00743B, #009E50);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-left: 10px;
+            box-shadow: 0 2px 8px rgba(0, 115, 59, 0.3);
+            cursor: pointer;
+        }
+        
+        .send-button:before {
+            content: '';
+            width: 15px;
+            height: 15px;
+            background-color: white;
+            clip-path: polygon(0 0, 0 100%, 100% 50%);
+            margin-left: 3px;
+        }
+        
+        .ai-thinking {
+            display: flex;
+            gap: 5px;
+            margin-top: 5px;
+            margin-left: 10px;
+        }
+        
+        .thinking-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #00743B;
+            border-radius: 50%;
+            opacity: 0.6;
+            animation: thinking 1.4s infinite;
+        }
+        
+        .thinking-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .thinking-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes thinking {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-5px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="status-bar">
+            <div class="time">9:41</div>
+            <div class="status-icons">
+                <div class="status-icon"></div>
+                <div class="status-icon"></div>
+                <div class="status-icon"></div>
+            </div>
+        </div>
+        
+        <div class="assistant-container">
+            <div class="header">
+                <a href="index.html" class="back-button"></a>
+                <div class="title">智能助手-永吉</div>
+            </div>
+            
+            <div class="chat-container">
+                <div class="message assistant">
+                    <div class="message-content">
+                        您好，我是智能助手-永吉。请问有什么可以帮助您的？
+                    </div>
+                    <div class="message-time">09:30</div>
+                </div>
+                
+                <div class="message user">
+                    <div class="message-content">
+                        我需要查询1号线信号系统的维修手册
+                    </div>
+                    <div class="message-time">09:31</div>
+                </div>
+                
+                <div class="message assistant">
+                    <div class="message-content">
+                        好的，我已为您找到1号线信号系统维修手册，包含以下几个部分：
+                        <br><br>
+                        1. 信号系统基础架构<br>
+                        2. 常见故障诊断流程<br>
+                        3. 维修操作规范<br>
+                        4. 安全注意事项
+                        <br><br>
+                        您需要查看哪一部分？
+                    </div>
+                    <div class="message-time">09:31</div>
+                    <div class="ai-thinking">
+                        <div class="thinking-dot"></div>
+                        <div class="thinking-dot"></div>
+                        <div class="thinking-dot"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="input-container">
+                <input type="text" class="input-field" placeholder="请输入您的问题...">
+                <div class="send-button"></div>
+            </div>
+        </div>
+    </div>
+</body>
+</html> 

@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>故障详情 - 地铁检修APP</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 375px;
+            height: 812px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 40px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        
+        .status-bar {
+            height: 44px;
+            background-color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0 20px;
+            position: relative;
+        }
+        
+        .time {
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .status-icons {
+            display: flex;
+            gap: 5px;
+            position: absolute;
+            right: 20px;
+        }
+        
+        .status-icon {
+            width: 18px;
+            height: 18px;
+            background-color: #333;
+            border-radius: 50%;
+        }
+        
+        .header {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            background-color: #00743B;
+            color: white;
+            justify-content: center;
+            position: relative;
+        }
+        
+        .back-button {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            left: 20px;
+            cursor: pointer;
+        }
+        
+        .back-button:before {
+            content: '';
+            width: 10px;
+            height: 10px;
+            border-left: 2px solid white;
+            border-bottom: 2px solid white;
+            transform: rotate(45deg);
+            margin-left: 5px;
+        }
+        
+        .title {
+            font-size: 20px;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        .content {
+            height: calc(100% - 44px - 70px);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+        
+        .detail-header {
+            padding: 20px;
+            background-color: white;
+            border-bottom: 1px solid #eee;
+            text-align: center;
+        }
+        
+        .fault-id {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
+        .fault-status {
+            display: inline-block;
+            font-size: 14px;
+            padding: 4px 12px;
+            border-radius: 15px;
+            margin-bottom: 10px;
+        }
+        
+        .status-resolved {
+            background-color: #e6f2ec;
+            color: #00743B;
+        }
+        
+        .status-pending {
+            background-color: #fff7e6;
+            color: #fa8c16;
+        }
+        
+        .detail-section {
+            flex: 1;
+            padding: 20px;
+            background-color: #f9f9f9;
+            overflow-y: auto;
+        }
+        
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            padding-left: 15px;
+        }
+        
+        .section-title:before {
+            content: '';
+            display: inline-block;
+            width: 3px;
+            height: 16px;
+            background-color: #00743B;
+            position: absolute;
+            left: 0;
+            border-radius: 2px;
+        }
+        
+        .detail-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            background-color: white;
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            max-width: 90%;
+            margin: 0 auto;
+        }
+        
+        .form-group {
+            display: flex;
+            border-bottom: 1px solid #f0f0f0;
+            padding-bottom: 12px;
+            align-items: center;
+            justify-content: flex-start;
+        }
+        
+        .form-label {
+            width: 120px;
+            font-size: 14px;
+            color: #666;
+            flex-shrink: 0;
+            text-align: right;
+            padding-right: 10px;
+        }
+        
+        .form-value {
+            flex: 1;
+            font-size: 14px;
+            color: #333;
+            font-weight: 500;
+            text-align: left;
+        }
+        
+        .long-text {
+            white-space: pre-wrap;
+            line-height: 1.5;
+        }
+        
+        .tab-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 80px;
+            background-color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-top: 1px solid #eee;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .ai-assistant-button {
+            width: 160px;
+            height: 50px;
+            background: linear-gradient(135deg, #00743B, #009E50);
+            border-radius: 25px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 5px 15px rgba(0, 115, 59, 0.3);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .ai-assistant-icon {
+            width: 24px;
+            height: 24px;
+            margin-right: 8px;
+            background-color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .ai-assistant-icon img {
+            width: 18px;
+            height: 18px;
+            object-fit: contain;
+            display: block;
+            margin: 0 auto;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .action-button {
+            flex: 1;
+            height: 44px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        .primary-button {
+            background-color: #00743B;
+            color: white;
+        }
+        
+        .secondary-button {
+            background-color: #f0f0f0;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="status-bar">
+            <div class="time">9:41</div>
+            <div class="status-icons">
+                <div class="status-icon"></div>
+                <div class="status-icon"></div>
+                <div class="status-icon"></div>
+            </div>
+        </div>
+        
+        <div class="content">
+            <div class="header">
+                <a href="fault-history.html" class="back-button"></a>
+                <div class="title">故障详情</div>
+            </div>
+            
+            <div class="detail-header">
+                <div class="fault-id">故障编号：FLT-2025-0312</div>
+                <div class="fault-status status-resolved">已解决</div>
+            </div>
+            
+            <div class="detail-section">
+                <div class="section-title">详细信息</div>
+                
+                <div class="detail-form">
+                    <div class="form-group">
+                        <div class="form-label">日期</div>
+                        <div class="form-value">2025-03-12</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="form-label">月份</div>
+                        <div class="form-value">3月</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="form-label">修程</div>
+                        <div class="form-value">二级修程</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="form-label">车辆号</div>
+                        <div class="form-value">QD-0325</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="form-label">车厢号</div>
+                        <div class="form-value">3号车厢</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="form-label">故障系统</div>
+                        <div class="form-value">信号系统</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="form-label">责任班组</div>
+                        <div class="form-value">信号维修一组</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="form-label">问题描述</div>
+                        <div class="form-value long-text">信号系统主板出现间歇性通信中断，导致车辆无法正常接收信号指令。经检查发现主板电容老化，需要更换。</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="form-label">问题属性</div>
+                        <div class="form-value">硬件故障</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="form-label">整改进度</div>
+                        <div class="form-value">已完成更换，系统恢复正常</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="form-label">开口项工区处置建议</div>
+                        <div class="form-value">建议加强对信号系统主板的定期检查，特别是电容老化情况</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="form-label">发现人</div>
+                        <div class="form-value">李工</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="form-label">处理人</div>
+                        <div class="form-value">张工</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="form-label">检查内容</div>
+                        <div class="form-value">信号系统主板通信功能、电容状态检查</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="form-label">是否闭环</div>
+                        <div class="form-value">是</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="form-label">问题分类</div>
+                        <div class="form-value">硬件故障</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="form-label">问题分类（一级）</div>
+                        <div class="form-value">设备故障</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="form-label">问题分类（二级）</div>
+                        <div class="form-value">电子元件故障</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="form-label">质检问题等级分类</div>
+                        <div class="form-value">B级</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="form-label">备注</div>
+                        <div class="form-value">此类故障为首次发现，建议对同批次车辆进行排查</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <div class="form-label">复查结果</div>
+                        <div class="form-value">是</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tab-bar">
+            <a href="ai-assistant.html" class="ai-assistant-button">
+                <div class="ai-assistant-icon">
+                    <img src="http://www.qd-metro.com/images/logo.png" alt="AI">
+                </div>
+                智能助手
+            </a>
+        </div>
+    </div>
+</body>
+</html> 

@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>历史故障查询 - 地铁检修APP</title>
+    <!-- 引入Chart.js库 -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 375px;
+            height: 812px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 40px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        
+        .status-bar {
+            height: 44px;
+            background-color: #ffffff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+        
+        .time {
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .status-icons {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .status-icon {
+            width: 18px;
+            height: 18px;
+            background-color: #333;
+            border-radius: 50%;
+        }
+        
+        .header {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            background-color: #00743B;
+            color: white;
+        }
+        
+        .back-button {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 15px;
+            cursor: pointer;
+        }
+        
+        .back-button:before {
+            content: '';
+            width: 10px;
+            height: 10px;
+            border-left: 2px solid white;
+            border-bottom: 2px solid white;
+            transform: rotate(45deg);
+            margin-left: 5px;
+        }
+        
+        .title {
+            font-size: 20px;
+            font-weight: bold;
+        }
+        
+        .content {
+            height: calc(100% - 44px - 70px);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+        
+        .filter-section {
+            padding: 8px;
+            background-color: white;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .filter-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .filter-title:before {
+            content: '';
+            display: inline-block;
+            width: 3px;
+            height: 16px;
+            background-color: #00743B;
+            margin-right: 8px;
+            border-radius: 2px;
+        }
+        
+        .filter-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        
+        .filter-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .filter-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 3px;
+        }
+        
+        .filter-select {
+            height: 32px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 0 8px;
+            font-size: 12px;
+        }
+        
+        .search-bar {
+            display: flex;
+            margin-top: 5px;
+        }
+        
+        .search-input {
+            flex: 1;
+            height: 36px;
+            border: 1px solid #ddd;
+            border-radius: 8px 0 0 8px;
+            padding: 0 10px;
+            font-size: 13px;
+        }
+        
+        .search-button {
+            width: 70px;
+            height: 36px;
+            background: linear-gradient(135deg, #00743B, #009E50);
+            color: white;
+            border: none;
+            border-radius: 0 8px 8px 0;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        
+        .results-section {
+            flex: 1;
+            padding: 8px;
+            background-color: #f9f9f9;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+        
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .results-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .results-count {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .fault-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .fault-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            border-left: 3px solid #00743B;
+            margin-bottom: 8px;
+        }
+        
+        .fault-header {
+            margin-bottom: 6px;
+        }
+        
+        .fault-id {
+            font-size: 15px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .fault-status {
+            font-size: 13px;
+            padding: 3px 8px;
+            border-radius: 12px;
+        }
+        
+        .status-resolved {
+            background-color: #e6f2ec;
+            color: #00743B;
+        }
+        
+        .status-pending {
+            background-color: #fff7e6;
+            color: #fa8c16;
+        }
+        
+        .fault-info {
+            margin-bottom: 6px;
+        }
+        
+        .info-item {
+            display: flex;
+            font-size: 13px;
+        }
+        
+        .info-label {
+            color: #999;
+            width: 70px;
+            flex-shrink: 0;
+        }
+        
+        .info-value {
+            color: #333;
+            flex: 1;
+        }
+        
+        .fault-footer {
+            display: flex;
+            justify-content: flex-end;
+        }
+        
+        .view-details {
+            font-size: 13px;
+            color: #00743B;
+            cursor: pointer;
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 40px 0;
+            color: #999;
+        }
+        
+        .no-results-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+            opacity: 0.5;
+        }
+        
+        .tab-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 80px;
+            background-color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-top: 1px solid #eee;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .ai-assistant-button {
+            width: 160px;
+            height: 50px;
+            background: linear-gradient(135deg, #00743B, #009E50);
+            border-radius: 25px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: 600;
+            box-shadow: 0 5px 15px rgba(0, 115, 59, 0.3);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .ai-assistant-icon {
+            width: 24px;
+            height: 24px;
+            margin-right: 8px;
+            background-color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .ai-assistant-icon img {
+            width: 18px;
+            height: 18px;
+            object-fit: contain;
+        }
+        
+        /* 图表样式优化 */
+        .visualization-section {
+            background-color: white;
+            border-radius: 12px;
+            padding: 12px;
+            margin: 10px 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .visualization-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            align-items: center;
+        }
+        
+        .visualization-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .toggle-charts {
+            font-size: 12px;
+            color: #00743B;
+            cursor: pointer;
+            padding: 3px 8px;
+            border-radius: 12px;
+            background-color: #e6f2ec;
+        }
+        
+        .chart-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-height: none;
+            overflow-y: visible;
+        }
+        
+        .chart-item {
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .chart-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            width: 100%;
+            text-align: left;
+        }
+        
+        .chart-icon {
+            font-size: 14px;
+            margin-right: 3px;
+            color: #00743B;
+        }
+        
+        .canvas-container {
+            width: 100%;
+            height: 200px;
+            position: relative;
+        }
+        
+        /* 添加日期显示样式 */
+        .date-display {
+            background-color: white;
+            padding: 8px 15px;
+            display: flex;
+            justify-content: center;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .date-text {
+            font-size: 14px;
+            color: #666;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="status-bar">
+            <div class="time">9:41</div>
+            <div class="status-icons">
+                <div class="status-icon"></div>
+                <div class="status-icon"></div>
+                <div class="status-icon"></div>
+            </div>
+        </div>
+        
+        <div class="content">
+            <div class="header">
+                <a href="index.html" class="back-button"></a>
+                <div class="title">历史故障查询</div>
+            </div>
+            
+            <!-- 添加日期显示 -->
+            <div class="date-display">
+                <div class="date-text" id="currentDate"></div>
+            </div>
+            
+            <div class="filter-section">
+                <div class="filter-title">筛选条件</div>
+                <div class="filter-grid">
+                    <div class="filter-item">
+                        <div class="filter-label">日期范围</div>
+                        <select class="filter-select">
+                            <option>全部时间</option>
+                            <option>最近一周</option>
+                            <option>最近一个月</option>
+                            <option>最近三个月</option>
+                            <option>自定义时间</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <div class="filter-label">修程类型</div>
+                        <select class="filter-select">
+                            <option>全部修程</option>
+                            <option>里程专项修</option>
+                            <option>系统修</option>
+                            <option>日常保洁</option>
+                            <option>施工普查</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <div class="filter-label">故障系统</div>
+                        <select class="filter-select">
+                            <option>全部系统</option>
+                            <option>信号系统</option>
+                            <option>供电系统</option>
+                            <option>车门系统</option>
+                            <option>空调系统</option>
+                            <option>制动系统</option>
+                        </select>
+                    </div>
+                    <div class="filter-item">
+                        <div class="filter-label">问题分类</div>
+                        <select class="filter-select">
+                            <option>全部问题</option>
+                            <option>外观类</option>
+                            <option>状态类</option>
+                            <option>螺栓安装类</option>
+                            <option>防松涂打类</option>
+                            <option>缺项漏项类</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="search-bar">
+                    <input type="text" class="search-input" placeholder="输入故障编号、关键词搜索">
+                    <button class="search-button">查询</button>
+                </div>
+            </div>
+            
+            <div class="results-section">
+                <!-- 增加数据可视化部分 -->
+                <div class="visualization-section">
+                    <div class="visualization-header">
+                        <div class="visualization-title">故障数据分析</div>
+                        <div class="toggle-charts">数据分析</div>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <!-- 饼图：系统故障占比 -->
+                        <div class="chart-item">
+                            <div class="chart-title">
+                                <span class="chart-icon">◉</span>
+                                各系统故障占比
+                            </div>
+                            <div class="canvas-container">
+                                <canvas id="systemsPieChart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <!-- 柱状图：问题分类数量 -->
+                        <div class="chart-item">
+                            <div class="chart-title">
+                                <span class="chart-icon">◉</span>
+                                问题分类数量
+                            </div>
+                            <div class="canvas-container">
+                                <canvas id="issuesBarChart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <!-- 折线图：故障趋势 -->
+                        <div class="chart-item">
+                            <div class="chart-title">
+                                <span class="chart-icon">◉</span>
+                                近期故障趋势
+                            </div>
+                            <div class="canvas-container">
+                                <canvas id="trendLineChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="results-header">
+                    <div class="results-title">查询结果</div>
+                    <div class="results-count">共 3 条记录</div>
+                </div>
+                
+                <div class="fault-list">
+                    <div class="fault-card">
+                        <div class="fault-header">
+                            <div class="fault-id">故障编号：FLT-2025-0312</div>
+                            <div class="fault-status status-resolved">已解决</div>
+                        </div>
+                        <div class="fault-info">
+                            <div class="info-item">
+                                <div class="info-label">故障系统：</div>
+                                <div class="info-value">信号系统</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">问题分类：</div>
+                                <div class="info-value">硬件故障</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">修程类型：</div>
+                                <div class="info-value">二级修程</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">报告时间：</div>
+                                <div class="info-value">2025-03-12 10:25</div>
+                            </div>
+                        </div>
+                        <div class="fault-footer">
+                            <a href="fault-detail.html" style="text-decoration: none;">
+                                <div class="view-details">查看详情</div>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="fault-card">
+                        <div class="fault-header">
+                            <div class="fault-id">故障编号：FLT-2025-0305</div>
+                            <div class="fault-status status-resolved">已解决</div>
+                        </div>
+                        <div class="fault-info">
+                            <div class="info-item">
+                                <div class="info-label">故障系统：</div>
+                                <div class="info-value">车门系统</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">问题分类：</div>
+                                <div class="info-value">正常磨损</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">修程类型：</div>
+                                <div class="info-value">一级修程</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">报告时间：</div>
+                                <div class="info-value">2025-03-05 14:10</div>
+                            </div>
+                        </div>
+                        <div class="fault-footer">
+                            <a href="fault-detail.html" style="text-decoration: none;">
+                                <div class="view-details">查看详情</div>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="fault-card">
+                        <div class="fault-header">
+                            <div class="fault-id">故障编号：FLT-2025-0228</div>
+                            <div class="fault-status status-pending">处理中</div>
+                        </div>
+                        <div class="fault-info">
+                            <div class="info-item">
+                                <div class="info-label">故障系统：</div>
+                                <div class="info-value">空调系统</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">问题分类：</div>
+                                <div class="info-value">软件故障</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">修程类型：</div>
+                                <div class="info-value">临时修程</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">报告时间：</div>
+                                <div class="info-value">2025-02-28 09:45</div>
+                            </div>
+                        </div>
+                        <div class="fault-footer">
+                            <a href="fault-detail.html" style="text-decoration: none;">
+                                <div class="view-details">查看详情</div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 无结果状态 -->
+                <!--
+                <div class="no-results">
+                    <div class="no-results-icon">🔍</div>
+                    <div>暂无符合条件的故障记录</div>
+                </div>
+                -->
+            </div>
+        </div>
+        
+        <div class="tab-bar">
+            <a href="ai-assistant.html" class="ai-assistant-button">
+                <div class="ai-assistant-icon">
+                    <img src="http://www.qd-metro.com/images/logo.png" alt="AI">
+                </div>
+                智能助手
+            </a>
+        </div>
+    </div>
+</body>
+<script>
+    // 图表显示切换功能
+    document.addEventListener('DOMContentLoaded', function() {
+        const toggleCharts = document.querySelector('.toggle-charts');
+        const chartContainer = document.querySelector('.chart-container');
+        
+        // 初始状态设置
+        let chartsVisible = true;
+        
+        // 点击切换按钮时的事件
+        toggleCharts.addEventListener('click', function() {
+            if (chartsVisible) {
+                chartContainer.style.display = 'none';
+                toggleCharts.textContent = '显示分析';
+                chartsVisible = false;
+            } else {
+                chartContainer.style.display = 'flex';
+                toggleCharts.textContent = '数据分析';
+                chartsVisible = true;
+            }
+        });
+        
+        // Chart.js图表配置
+        // 1. 饼图：各系统故障占比
+        const systemsPieCtx = document.getElementById('systemsPieChart').getContext('2d');
+        const systemsPieChart = new Chart(systemsPieCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['信号系统', '车门系统', '空调系统', '供电系统', '制动系统'],
+                datasets: [{
+                    data: [25, 20, 20, 20, 15],
+                    backgroundColor: [
+                        '#00743B',
+                        '#009E50',
+                        '#33CC66',
+                        '#66D989',
+                        '#99E6AC'
+                    ],
+                    borderColor: '#fff',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            boxWidth: 12,
+                            padding: 15,
+                            font: {
+                                size: 10
+                            }
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return context.label + ': ' + context.raw + '%';
+                            }
+                        }
+                    }
+                },
+                cutout: '60%'
+            }
+        });
+        
+        // 2. 柱状图：问题分类数量
+        const issuesBarCtx = document.getElementById('issuesBarChart').getContext('2d');
+        const issuesBarChart = new Chart(issuesBarCtx, {
+            type: 'bar',
+            data: {
+                labels: ['硬件故障', '软件故障', '人为损坏', '正常磨损', '其他'],
+                datasets: [{
+                    label: '故障数量',
+                    data: [12, 10, 6, 8, 4],
+                    backgroundColor: '#00743B',
+                    borderRadius: 4,
+                    barThickness: 25,
+                    maxBarThickness: 30
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            title: function(tooltipItems) {
+                                return tooltipItems[0].label;
+                            },
+                            label: function(context) {
+                                return '数量: ' + context.raw + ' 件';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            display: true,
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        },
+                        ticks: {
+                            font: {
+                                size: 10
+                            },
+                            stepSize: 2
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            font: {
+                                size: 10
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        
+        // 3. 折线图：故障趋势
+        const trendLineCtx = document.getElementById('trendLineChart').getContext('2d');
+        const trendLineChart = new Chart(trendLineCtx, {
+            type: 'line',
+            data: {
+                labels: ['1月', '2月', '3月', '4月', '5月', '6月'],
+                datasets: [{
+                    label: '故障数量',
+                    data: [8, 12, 10, 14, 16, 12],
+                    fill: true,
+                    backgroundColor: 'rgba(0, 116, 59, 0.1)',
+                    borderColor: '#00743B',
+                    tension: 0.3,
+                    pointBackgroundColor: '#00743B',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                    pointRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            title: function(tooltipItems) {
+                                return tooltipItems[0].label;
+                            },
+                            label: function(context) {
+                                return '故障数量: ' + context.raw + ' 件';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            display: true,
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        },
+                        ticks: {
+                            font: {
+                                size: 10
+                            },
+                            stepSize: 5
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            font: {
+                                size: 10
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    });
+
+    // 添加日期显示功能
+    function formatDate() {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = now.getMonth() + 1;
+        const date = now.getDate();
+        const weekDay = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'][now.getDay()];
+        return `${year}年${month}月${date}日 ${weekDay}`;
+    }
+    
+    document.getElementById('currentDate').textContent = formatDate();
+</script>
+</html> 
